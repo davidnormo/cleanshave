@@ -1,0 +1,18 @@
+{
+  "name": "domplate",
+  "version": "0.1.0",
+  "author": "David Normington <david.normo@gmail.com>",
+  "description": "Create Document Fragments from a mustache templates.",
+  "devDependencies": {
+    "chai": "^1.9.2",
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-uglify": "^0.6.0",
+    "grunt-mocha-cli": "^1.10.0",
+    "grunt-peg": "^1.5.0",
+    "jsdom": "^1.0.3",
+    "jsonfile": "^2.0.0",
+    "mocha": "^2.0.1",
+	"nomnom": "1.8.0"
+  }
+}

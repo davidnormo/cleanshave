@@ -1,0 +1,48 @@
+template
+  = (tag / html / text)+
+
+tag
+  = '{{' ' '? content:alphawords dot:dotted? ' '? '}}' { 
+      return { escape: content.trim(), dotted: dot || [] } 
+    }
+    / '{{{' content: alphawords dot:dotted? '}}}' { 
+      return { noescape: content.trim(), dotted: dot || [] } 
+    }
+    / '{{&' content: alphawords dot:dotted? '}}' { 
+      return { noescape: content.trim(), dotted: dot || [] } 
+    }
+    / '{{#' section:alphawords '}}' inner:template '{{/' alphawords '}}' { 
+      return { section: section, inner: inner } 
+    }
+
+html
+  = '<' tagname:alphaword attributes:(attributes+)? '>' content:(template)? ('</' alphaword '>')? { 
+    return { html: tagname, attributes: attributes || [], inner: content || [] }
+  }
+
+text
+  = text:words { return { text: text } }
+
+attributes
+  = ' ' key:(attributeIdent / tag) '=' ['"] value:(alphawords / tag)+ ['"] { return { key: key, value: value } }
+
+dotted
+  = ('.' obj:alphaword { return obj; })+
+
+attributeIdent
+  = word:[a-zA-Z-]+ { return word.join(''); }
+
+alphaword
+  = word:[a-zA-Z0-9]+ { return word.join(''); }
+
+alphawords
+  = words:[a-zA-Z0-9 ]+ { return words.join(''); }
+
+words
+  = words:(nonTag / ' ' / [^<{])+ { return words.join('').replace(/"/g, "\\\"") }
+
+nonTag
+  = start:[^ <] ![{] txt:([^ <]+)? { 
+    txt = txt || [];
+    return start + txt.join('') 
+  }

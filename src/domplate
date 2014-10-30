@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+var opts = require('nomnom')
+	.options({
+		'template':{
+			abbr: 't',
+			help: 'Path to the template'
+		},
+		'dest': {
+			help: 'The destination directory',
+			abbr: 'd'
+		}
+	}).parse();
+
+var isFileIO = (typeof opts.template === 'string' && typeof opts.dest === 'string');
+
+if(!isFileIO){
+	process.exit(1);
+}
+
+if(isFileIO){
+	var FileIO = require('./fileIO'),
+		io = new FileIO(opts.template, opts.dest);
+}
