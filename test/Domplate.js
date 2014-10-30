@@ -69,7 +69,7 @@ var specs = [{
 }];
 
 describe('Domplate', function() {
-	//specs = [specs[1]];
+	//specs = [specs[4]];
 	specs.forEach(function(spec){
 		it(spec.desc, function(){
 			var template = new Domplate(spec.template);

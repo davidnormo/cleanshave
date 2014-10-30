@@ -5,11 +5,12 @@ var jsonfile = require('jsonfile'),
 	jsdom = require('jsdom');
 
 describe('Interpolation', function(){
-	//specs.tests = [specs.tests[3]];
+	// specs.tests = [specs.tests[14]];
     specs.tests.forEach(function(spec) {
 		it(spec.name, function(){
 			var domplate = new Domplate('<div>'+spec.template+'</div>'),
 				result = domplate.compile();
+				// console.log(result);
 
 			jsdom.env('<p>hi</p>', function(errs, window) {
 				document = window.document;

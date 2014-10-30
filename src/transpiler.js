@@ -27,17 +27,20 @@ module.exports = (function() {
 	 * @param  {Object} parseTree
 	 */
 	Domplate.prototype.compile = function(parseTree){
-		var fragmentStr = 'var fragment = document.createDocumentFragment();';
+		var createStr = 'var fragment = document.createDocumentFragment();',
+			editStr = '';
 		this.parent = 'fragment';
 		this.elCount = {};
 
 		//loop through all top layer nodes
 		//addNodes() can be called recursively to handle nested elements
 		this.parseTree.forEach(function(node){
-			fragmentStr += this.addNodes('fragment', node);
+			var strings = this.addNodes('fragment', node);
+			createStr += strings.create;
+			editStr += strings.edit;
 		}, this);
 
-		return this.addFunction(fragmentStr);
+		return this.addFunction(createStr, editStr);
 	};
 
 	/**
@@ -46,27 +49,30 @@ module.exports = (function() {
 	 * @param {Object} node
 	 */
 	Domplate.prototype.addNodes = function(parent, node){
-		var fragmentStr = '';
+		var createStr = '', editStr = '';
 
 		if(node.text){  //is a text node
-			fragmentStr += parent+'.appendChild(document.createTextNode("'+node.text+'"));';
+			createStr += parent+'.appendChild(document.createTextNode("'+node.text+'"));';
 
 		} else if(node.html){ //is an html node
-			fragmentStr += this.addElements(node);
+			var strings = this.addElements(node);
+			createStr += strings.create;
+			editStr += strings.edit;
+
 			var name = node.html + this.elCount[node.html];
-			fragmentStr += parent+'.appendChild('+name+');';
+			createStr += parent+'.appendChild('+name+');';
 
 		} else {  //is a tag
 			var method = Object.keys(node)[0];
 			if(/escape/.test(method)){  //is an escape/noescape tag
-				fragmentStr += parent+'.innerHTML += '+this[method](node)+';';
+				editStr += parent+'.innerHTML += '+this[method](node)+';';
 
 			} else {  // is a section tag
-				fragmentStr += this.section(parent, node);
+				editStr += this.section(parent, node);
 			}
 		}
 
-		return fragmentStr;
+		return { create: createStr, edit: editStr };
 	};
 
 	/**
@@ -78,31 +84,47 @@ module.exports = (function() {
 		var tagname = el.html;
 		//keep count of each element type
 		num = this.elCount[tagname] = (this.elCount[tagname] || 0) + 1;
-		var name = tagname + num, fragmentStr = '';
+		var name = tagname + num, createStr = '', editStr = '';
 
 		//create new element using el tagname and count as variable name
-		fragmentStr += 'var '+name+' = document.createElement("'+tagname+'");';
+		createStr += 'var '+name+' = document.createElement("'+tagname+'");';
 
 		//if there are attributes for this element...
 		if(el.attributes.length){
 			//add them all
 			el.attributes.forEach(function(attribute){
-				var key = this.compileValue(attribute.key), 
+				var attrStr = '',
+					key = this.compileValue(attribute.key), 
 					value = this.compileValue(attribute.value);
 
-				fragmentStr += name+'.setAttribute('+key+', '+value+');';
+				attrStr = name+'.setAttribute('+key+', '+value+');';
+
+				if(hasTag(attribute.key) || hasTag(attribute.value)){
+					editStr += attrStr;
+				} else {
+					createStr += attrStr;
+				}
 			}, this);
 		}
 
 		//if there is inner content to this element...
 		if(el.inner.length){
 			var prevParent = this.parent;
+			//if the innerHTML has a tag, all of the innerHTML must be added at edit time
+			var editOnly = hasTag(el.inner);
 			el.inner.forEach(function(node){
-				fragmentStr += this.addNodes(name, node);
+				var strings = this.addNodes(name, node);
+
+				if(editOnly){
+					editStr += strings.create + strings.edit;
+				} else {
+					createStr += strings.create;
+					editStr += strings.edit;
+				}
 			}, this);
 		}
 
-		return fragmentStr;
+		return { create: createStr, edit: editStr };
 	};
 
 	/**
@@ -111,7 +133,7 @@ module.exports = (function() {
 	 * 
 	 * @param {String} fragmentStr
 	 */
-	Domplate.prototype.addFunction = function(fragmentStr){
+	Domplate.prototype.addFunction = function(createStr, editStr){
 		var helpers = [
 			//funcs.js line 10
 			'var escapeHTML=function(e){if(typeof e!=="string")return e;return e.replace(/&/g,"&").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/["]/g,"&quot;").replace(/\'/g,"&#039;")};',
@@ -120,8 +142,9 @@ module.exports = (function() {
          	'var resolveKey=function(e,t){var n=e,r="";for(var i=0;i<t.length;i++){r=t[i];if(n[r]===undefined){return""}n=n[r]}return n};'
 		];
 
-		var func  = '(function(){ '+helpers.join('')+'return function(obj, options){'+fragmentStr+
-			'return fragment; }; })();';
+		var func  = '(function(){ '+helpers.join('')+createStr+
+			'return function(obj, options){'+editStr+
+			'return fragment.cloneNode(true); }; })();';
 		return func;
 	};
 
@@ -197,13 +220,14 @@ module.exports = (function() {
 	 * @return {string}
 	 */
 	Domplate.prototype.section = function(parent, node){
-		str = 'tmp=obj;obj=obj["'+node.section+'"];';
+		var editStr = 'tmp=obj;obj=obj["'+node.section+'"];';
 
 		node.inner.forEach(function(node){
-			str += this.addNodes(parent, node);
+			var strings = this.addNodes(parent, node);
+			editStr += strings.create + strings.edit;
 		}, this);
 
-		return str + 'obj=tmp;'
+		return editStr + 'obj=tmp;'
 	};
 
 	/**
@@ -222,6 +246,28 @@ module.exports = (function() {
 		}, '[' + starting ) + ']';
 
 		return 'resolveKey(obj,'+path+')';
+	}
+
+	/**
+	 * Checks if the input is a tag or has a tag buried inside
+	 * @param  {String|Object|Array}  input
+	 * @return {Boolean}       [description]
+	 */
+	var hasTag = function(input){
+		if(typeof input === 'string'){
+			return false;
+		} else if(input instanceof Array){
+			for(var i = 0; i < input.length; i++){
+				if(typeof value !== 'string') {
+					return true;
+				}
+			}
+			return false;
+		} else if(typeof input === 'object' && input.html){
+			return false;
+		}
+
+		return true;
 	}
 
 	return Domplate;
