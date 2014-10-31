@@ -2,10 +2,14 @@
 _From a hairy HTML template, to a well groomed DOM based template._  
 This is a "proof of concept" to see if we can have best of both worlds; We can continue to write HTML based templates and use DOM based templates at runtime.
 
-cleanshave is a CLI tool that optimises HTML based templates by [transpiling](http://en.wikipedia.org/wiki/Source-to-source_compiler) them into DOM based templates or domplate.
-For example, running this:  
-`cleanshave -t template.jst -d ./output/`
+cleanshave is a CLI tool that optimises HTML based templates by [transpiling](http://en.wikipedia.org/wiki/Source-to-source_compiler) them into DOM based templates or domplates.
+For example, running cleanshave over a template like so:  
 
+```bash
+cleanshave -t template.jst -d ./output/
+```  
+
+Produces a corresponding domplate (simplified for the sake of clarity):
 <table>
 <tr><td><code>template.jst</code></td><td>&rarr;</td><td><code>output/template.js</code></td></tr>
 <tr>
@@ -48,4 +52,4 @@ You may be asking why? Because it avoids us using string based templates at runt
 - ***Keep doing what you're doing:*** No one wants to write domplates by hand. Templates are expressive, familiar and quick to create. Using DOM nodes provides performance. Cleanshave combine both approaches.
 
 ## Limitations
-
+- At the moment only a subset of the Mustache templating syntax is supported. This will be extended with time.
