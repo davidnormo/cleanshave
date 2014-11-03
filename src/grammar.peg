@@ -11,9 +11,10 @@ tag
     / '{{&' content: alphawords dot:dotted? '}}' { 
       return { noescape: content.trim(), dotted: dot || [] } 
     }
-    / '{{#' section:alphawords '}}' inner:template '{{/' alphawords '}}' { 
-      return { section: section, inner: inner } 
+    / '{{#' ' '? section:alphaword dotted:dotted? ' '? '}}' inner:template? '{{/' alphawords dotted? '}}' { 
+      return { section: section, inner: inner || [], dotted: dotted || [] } 
     }
+    / '{{' ' '? '.' ''? '}}' { return { 'iterator': '.' }; }
 
 html
   = '<' tagname:alphaword attributes:(attributes+)? '>' content:(template)? ('</' alphaword '>')? { 
@@ -39,7 +40,7 @@ alphawords
   = words:[a-zA-Z0-9 ]+ { return words.join(''); }
 
 words
-  = words:(nonTag / ' ' / [^<{])+ { return words.join('').replace(/"/g, "\\\"") }
+  = words:([^<{] / nonTag / ' ')+ { return words.join('').replace(/"/g, "\\\"") }
 
 nonTag
   = start:[^ <] ![{] txt:([^ <]+)? { 

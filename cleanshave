@@ -18,6 +18,6 @@ if(!isFileIO){
 }
 
 if(isFileIO){
-	var FileIO = require('./fileIO'),
+	var FileIO = require('./src/fileIO'),
 		io = new FileIO(opts.template, opts.dest);
 }

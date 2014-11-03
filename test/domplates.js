@@ -1,4 +1,4 @@
-var Domplate = require('../src/transpiler'),
+var Cleanshave = require('../src/cleanshave'),
 	assert = require('chai').assert,
 	jsdom = require('jsdom');
 
@@ -66,20 +66,28 @@ var specs = [{
 		assert.instanceOf(p, window.HTMLElement);
 		assert.equal(p.innerHTML, 'Hi there');
 	}
+}, {
+	desc: 'the horrible nested section test',
+	template: '<div>{{#a}}{{one}}{{#b}}{{one}}{{two}}{{one}}{{/b}}{{one}}{{/a}}</div>',
+	data: { a: { one: 1, two: 'x' }, b: { one: 'z', two: 2 }},
+	result: function(window, document){
+		var div = document.querySelector('div');
+		assert.equal(div.innerHTML, '1z2z1');
+	}
 }];
 
 describe('Domplate', function() {
-	//specs = [specs[4]];
+	// specs = [specs[3]];
 	specs.forEach(function(spec){
 		it(spec.desc, function(){
-			var template = new Domplate(spec.template);
+			var template = new Cleanshave(spec.template);
 			var result = template.compile();
-			//console.log(result);
+			// console.log(result);
 
 			jsdom.env('<p>hi</p>', function(errs, window) {
 				document = window.document;
-				var template = eval(result);
-				var frag = template(spec.data || {});
+				var domplate = eval(result);
+				var frag = domplate(spec.data || {});
 
 				document.body.appendChild(frag);
 				spec.result(window, document);

@@ -1,5 +1,5 @@
 var fs = require('fs'),
-	Transpiler = require('./transpiler');
+	Cleanshave = require('./cleanshave');
 
 /**
  * FileIO reads in a file, transpiles and outputs to the target dir
@@ -20,8 +20,11 @@ function FileIO(template, dest){
 	fs.readFile(template, function(err, data){
 		if(err) throw err;
 
-		var trans = new Transpiler(data.toString()),
-			domplate = trans.compile();
+		var template = new Cleanshave(data.toString()),
+			domplate = template.compile();
+
+			console.log(domplate);
+			process.exit(0);
 
 		fs.writeFile(dest+outFilename, domplate, function(){
 			console.log('Domplate complete!');
@@ -30,5 +33,4 @@ function FileIO(template, dest){
 	});
 }
 FileIO.prototype.constructor = FileIO;
-
 module.exports = FileIO;

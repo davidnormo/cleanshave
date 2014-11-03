@@ -1,11 +1,11 @@
 var jsonfile = require('jsonfile'),
-    specs = jsonfile.readFileSync('specs/interpolation.json'),
+    specs = jsonfile.readFileSync('specs/sections.json'),
     Cleanshave = require('../src/cleanshave'),
     assert = require('chai').assert,
 	jsdom = require('jsdom');
 
-describe('Interpolation', function(){
-	// specs.tests = [specs.tests[20]];
+describe('Sections', function(){
+	// specs.tests = [specs.tests[24]];
     specs.tests.forEach(function(spec) {
 		it(spec.name, function(){
 			var template = new Cleanshave('<div>'+spec.template+'</div>'),
