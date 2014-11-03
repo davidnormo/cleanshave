@@ -1,4 +1,4 @@
-# cleanshave v0.1.0
+# cleanshave v0.2.0
 _From a hairy HTML template, to a well groomed DOM based template._  
 This is a "proof of concept" to see if we can have best of both worlds; We can continue to write HTML based templates and use DOM based templates at runtime.
 
