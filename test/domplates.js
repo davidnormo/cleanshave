@@ -1,6 +1,7 @@
 var Cleanshave = require('../src/cleanshave'),
 	assert = require('chai').assert,
-	jsdom = require('jsdom');
+	jsdom = require('jsdom'),
+	shave = require('../src/lib.min.js');
 
 var specs = [{
 	desc: 'should compile a simple div',
@@ -80,14 +81,15 @@ describe('Domplate', function() {
 	// specs = [specs[3]];
 	specs.forEach(function(spec){
 		it(spec.desc, function(){
-			var template = new Cleanshave(spec.template);
+			var template = new Cleanshave(spec.template, { name: 'domplate' });
 			var result = template.compile();
 			// console.log(result);
 
 			jsdom.env('<p>hi</p>', function(errs, window) {
+				window.shave = shave;
 				document = window.document;
-				var domplate = eval(result);
-				var frag = domplate(spec.data || {});
+				eval(result);
+				var frag = window.domplate(spec.data || {});
 
 				document.body.appendChild(frag);
 				spec.result(window, document);

@@ -34,7 +34,7 @@ NodeActions.prototype.createTextNode = function(text){
 	var node = 'document.createTextNode("'+text+'")';
 
 	if(this.options.append){
-		node = this.parentEl+'.appendChild('+node+');';
+		node = 'a('+this.parentEl+','+node+');';
 	} else {
 		var varName = this.uniqueId();
 		node = {
@@ -53,7 +53,7 @@ NodeActions.prototype.createTextNode = function(text){
 NodeActions.prototype.uniqueId = (function(){
 	var id = 0;
 	return function(){
-		return 'node'+(++id);
+		return 'n'+(++id);
 	};
 })();
 
@@ -63,5 +63,13 @@ NodeActions.prototype.uniqueId = (function(){
  * @return {String}
  */
 NodeActions.prototype.appendChild = function(nodeName){
-	return this.parentEl+'.appendChild('+nodeName+');';
+	return 'a('+this.parentEl+','+nodeName+');';
+};
+
+/**
+ * Builds a cloneNode string
+ * @type {String}
+ */
+NodeActions.prototype.cloneNode = function(nodeName){
+	return 'c('+nodeName+')';
 };

@@ -1,28 +1,40 @@
+{
+  var Tag = require('./parser/tag'),
+      Section = require('./parser/section'),
+      Text = require('./parser/text'),
+      HTML = require('./parser/html');
+}
+
 template
   = (tag / html / text)+
 
 tag
-  = '{{' ' '? content:alphawords dot:dotted? ' '? '}}' { 
-      return { escape: content.trim(), dotted: dot || [] } 
+  = '{{' key:tagKey '}}' { 
+      return new Tag(key, true); 
     }
-    / '{{{' content: alphawords dot:dotted? '}}}' { 
-      return { noescape: content.trim(), dotted: dot || [] } 
+    / '{{{' key:tagKey '}}}' { 
+      return new Tag(key, false); 
     }
-    / '{{&' content: alphawords dot:dotted? '}}' { 
-      return { noescape: content.trim(), dotted: dot || [] } 
+    / '{{&' key:tagKey '}}' { 
+      return new Tag(key, false);
     }
-    / '{{#' ' '? section:alphaword dotted:dotted? ' '? '}}' inner:template? '{{/' alphawords dotted? '}}' { 
-      return { section: section, inner: inner || [], dotted: dotted || [] } 
+    / '{{#' key:tagKey '}}' inner:template? '{{/' tagKey '}}' { 
+      return new Section(key, inner, false); 
     }
-    / '{{' ' '? '.' ''? '}}' { return { 'iterator': '.' }; }
+
+tagKey
+  = key:[a-zA-Z0-9 .]+ { 
+    var result = key.join('').trim();
+    return result === '.' ? [result] : result.split('.'); 
+  }
 
 html
   = '<' tagname:alphaword attributes:(attributes+)? '>' content:(template)? ('</' alphaword '>')? { 
-    return { html: tagname, attributes: attributes || [], inner: content || [] }
+    return new HTML(tagname, attributes, content);
   }
 
 text
-  = text:words { return { text: text } }
+  = text:words { return new Text(text); }
 
 attributes
   = ' ' key:(attributeIdent / tag) '=' ['"] value:(alphawords / tag)+ ['"] { return { key: key, value: value } }

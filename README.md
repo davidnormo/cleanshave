@@ -53,3 +53,9 @@ You may be asking why? Because it avoids us using string based templates at runt
 
 ## Limitations
 - At the moment only a subset of the Mustache templating syntax is supported. This will be extended with time.
+
+## Install
+Install with npm:
+```
+npm install -g cleanshave
+```

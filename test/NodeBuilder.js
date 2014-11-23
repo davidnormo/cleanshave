@@ -31,19 +31,19 @@ describe('NodeBuilder', function(){
 	describe('createTextNode()', function(){
 		it('should make the createTextNode string', function(){
 			var result = NodeBuilder({}, 'div1').createTextNode('Hello world!');
-			assert.equal(result, 'div1.appendChild(document.createTextNode("Hello world!"));');
+			assert.equal(result, 'a(div1,document.createTextNode("Hello world!"));');
 		});
 
 		it('should return the node if append is false', function(){
 			var result = NodeBuilder({ append: false }, 'div1').createTextNode('Hi there');
-			assert.ok(/this.node[0-9]+=document\.createTextNode\("Hi there"\);/.test(result.str));
+			assert.ok(/this.n[0-9]+=document\.createTextNode\("Hi there"\);/.test(result.str));
 		});
 	});
 
 	describe('appendChild()', function(){
 		it('should make the appendChild string', function(){
 			var result = NodeBuilder({}, 'div1').appendChild('someNode');
-			assert.equal(result, 'div1.appendChild(someNode);');
+			assert.equal(result, 'a(div1,someNode);');
 		});
 	});
 });

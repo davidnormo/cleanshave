@@ -19,39 +19,40 @@ var escapeHTML = function(input) {
 
 /**
  * Resolves a key in a stack of contexts
- * @param  {[type]} stack [description]
- * @param  {[type]} path  [description]
- * @return {[type]}       [description]
+ *
+ * @param  {Array} stack   Array of context objects
+ * @param  {Array} path    Array of keys where ['a','b'] => context.a.b
+ * @return {String}		   The resulting value or empty string if not found
  */
 var resolveKey = function(stack, path) {
-	var key = '', result = '';
-
-	stackLoop: for (var j = 0; j < stack.length; j++) {
+	for (var j = 0; j < stack.length; j++) {
 		var target = stack[j];
 
-		pathLoop: for (var i = 0; i < path.length; i++) {
-			key = path[i];
-			target = target[key];
-			if (target === undefined) {
-				break pathLoop;
-			}
-		}
+		//cheapest way of getting the objects value;
+		try {
+			target = eval('target.' + (path.join('.')));
+		} catch (e) {};
 
-		if(target !== undefined && typeof target !== 'object') return target;
+		if (target !== stack[j] && target !== undefined) return target;
 	}
 
 	return '';
 };
 
+/**
+ * Returns the value in an object, given a key(s)
+ *
+ * @param  {Array} stack     An array of context objects or values
+ * @param  {String} starting The key to search for
+ * @param  {Array} [dotted]  Optional array of keys where ['a','b'] => context.a.b
+ * @return {String}          The resulting value or empty string if not found
+ */
 var getObjectValue = function(stack, starting, dotted) {
-	if(starting === '.') return stack.pop();
-	if (!dotted.length) return resolveKey(stack, ['' + starting]);
+	//if we are resolving an implicit iterator, return the next value in the array
+	if (starting === '.') return stack.pop();
 
-	var path = [starting];
-	for (var i = 0; i < dotted.length; i++) {
-		path.push(dotted[i]);
-	}
-	return resolveKey(stack, path);
+	//else search for value in stack
+	return resolveKey(stack, [starting].concat(dotted || []));
 };
 
 /**
@@ -84,21 +85,98 @@ var getObjectValue = function(stack, starting, dotted) {
 		a => [{ section: a, inner: ['one','yzx','one'] }]
 		b => [{ section: b, inner: ['one','two','one'] }]
  */
-var processSection = function(data, vars, parentEl, contextStack) {
+var sec = {
+	init: function(data, tree, parentEl) {
+		this.data = data;
+		this.tree = tree;
+		this.parentEl = parentEl;
+		this.sectionKey = tree.section;
+		this.sectionValue = this.getSectionValue();
+
+		switch (typeof sectionValue) {
+			case 'boolean':
+				boolSection();
+			case 'object':
+				if (sectionValue instanceof Array) {
+					//iterating over an array
+				} else {
+					//using the context of the object
+				}
+		}
+	},
+
+	getSectionValue: function(){
+		var sectionValue = this.data[this.sectionKey],
+			falseyValues = [[], '', false, undefined];
+
+		var result = falseyValues.some(function(value){
+			return sectionValue === falseValue;
+		}, this);
+
+		return result;
+	},
+
+	boolSection: function(overrideValue) {
+		if(overrideValue !== undefined){
+			this.sectionValue = overrideValue
+		}
+
+		var isInverted = this.tree.inverted || false,
+			//if inverted falsey  render, else true allows render
+			okToRender = !isInverted;
+
+		if (this.sectionValue === okToRender){
+			this.renderBlock();
+		}
+	},
+
+	renderBlock: function(block) {
+		block.forEach(function(blockPart) {
+			if (typeof blockPart !== "object") {
+				//it is a variable name in the create context
+				a(this.parentEl, c(that[blockPart]));
+
+			} else if (blockPart.section !== undefined) {
+				//is either a tag, a section or some html
+				var innerFrag = document.createDocumentFragment();
+
+				//recursively process inner section
+				sec(this.data, that[blockPart.section], innerFrag, contextStack);
+
+				//remove last context from stack
+				contextStack.shift();
+
+				a(parentEl, innerFrag);
+
+			} else {
+				//for escape/noescape tags
+				var method = Object.keys(blockPart)[0],
+					contextData = contextStack.length ? contextStack : [this.data],
+					text = getObjectValue(contextData, blockPart[method], blockPart.dotted);
+
+				text = method === 'escape' ? escapeHTML(text) : text;
+
+				a(parentEl, document.createTextNode(text));
+			}
+		}, this);
+	}
+};
+
+var sec = function(data, vars, parentEl, contextStack) {
 	var key = vars.section;
 	var context = data[key];
 
 	//handled dotted notation: {{#a.b.c}}{{/a.b.c}}
-	if(vars.dotted.length){
+	if (vars.dotted.length) {
 		key = vars.dotted[(vars.dotted.length - 1)];
-		context = vars.dotted.reduce(function(ctx, key){
+		context = vars.dotted.reduce(function(ctx, key) {
 			//if undefined is found whilst resolving, use empty list, which won't evaluate anything
 			return ctx[key] ? ctx[key] : [];
 		}, context);
 	}
 
 	contextStack = contextStack || [];
-	if(!(context instanceof Array)){
+	if (!(context instanceof Array)) {
 		contextStack.unshift(context);
 	}
 
@@ -113,23 +191,30 @@ var processSection = function(data, vars, parentEl, contextStack) {
 		variables.forEach(function(variable) {
 			if (typeof variable !== "object") {
 				//it is a variable name in the create context
-				parentEl.appendChild(that[variable].cloneNode(true));
+				a(parentEl, c(that[variable]));
 
 			} else {
 				//is either a tag, a section or some html
 				if (variable.section !== undefined) {
-					var innerSection = variable.section;
 					var innerFrag = document.createDocumentFragment();
-					processSection(data, that[innerSection], innerFrag, contextStack);
+
+					//recursively process inner section
+					sec(data, that[variable.section], innerFrag, contextStack);
+
+					//remove last context from stack
 					contextStack.shift();
-					parentEl.appendChild(innerFrag);
+
+					a(parentEl, innerFrag);
 
 				} else {
 					//for escape/noescape tags
 					var method = Object.keys(variable)[0],
 						contextData = contextStack.length ? contextStack : [obj],
-						text = escapeHTML(getObjectValue(contextData, variable[method], variable.dotted));
-					parentEl.appendChild(document.createTextNode(text));
+						text = getObjectValue(contextData, variable[method], variable.dotted);
+
+					text = method === 'escape' ? escapeHTML(text) : text;
+
+					a(parentEl, document.createTextNode(text));
 				}
 			}
 		});
@@ -157,11 +242,33 @@ var processSection = function(data, vars, parentEl, contextStack) {
 		//if data is an object
 		iterate(context, true);
 
-	} else if(context instanceof Array){
+	} else if (context instanceof Array) {
 		iterate(context);
 
 	} else if (context == true) {
 		//if the value is truthy, display the contents
 		iterate([data]);
 	}
+};
+
+/* Minification helpers */
+
+/**
+ * Append child
+ * @param  {HTMLElement} parent [description]
+ * @param  {HTMLElement} child  [description]
+ * @return {[type]}        [description]
+ */
+var a = function(parent, child) {
+	parent.appendChild(child);
+	return parent;
+};
+
+/**
+ * Clone node
+ * @param  {HTMLElement} node
+ * @return {HTMLElement}
+ */
+var c = function(node) {
+	return node.cloneNode(true);
 };

@@ -1,12 +1,13 @@
 {
   "name": "cleanshave",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "author": "David Normington <david.normo@gmail.com>",
   "description": "From a hairy HTML template, to a well groomed DOM based template.",
   "repository":{
     "type": "git",
     "url": "git@github.com:davidnormo/cleanshave.git"
   },
+  "homepage": "http://github.com/davidnormo/cleanshave",
   "devDependencies": {
     "chai": "^1.9.2",
     "grunt": "^0.4.5",
@@ -19,5 +20,9 @@
   },
   "dependencies": {
 	  "nomnom": "1.8.0"
+  },
+  "preferGlobal": true,
+  "bin": {
+    "cleanshave": "./cleanshave"
   }
 }
