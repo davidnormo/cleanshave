@@ -74,7 +74,9 @@ Domplate.prototype.addFunction = function(createStr, editStr) {
 		'return function(data){var frag = shave.c(fragment);' + editStr + 'return frag; };';
 
 	if (this.options.moduleType === 'amd') {
-		func = 'define(["shave"],function(){ ' + func + '});';
+		func = 'define(["shave"],function(){' + func + '});';
+	} else if(this.options.moduleType === 'node'){ 
+		func = 'var shave = require("shave");module.exports = (function(){' + func +'})();';	
 	} else {
 		func = 'window.' + this.options.name + '=(function(){' + func + '})();';
 	}

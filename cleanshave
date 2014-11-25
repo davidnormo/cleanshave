@@ -1,37 +1,35 @@
 #!/usr/bin/env node
 var opts = require('nomnom')
-	.options({
-		'template':{
-			abbr: 't',
-			help: 'Path to the template'
-		},
-		'dest': {
-			help: 'The destination directory',
-			abbr: 'd'
-		},
-		'amd': {
-			help: 'Creates the domplate using the AMD pattern',
-			flag: true
-		},
-		'node': {
-			help: 'Creates the domplate using the CommonJS module pattern, compatible with browserify.',
-			flag: true
-		}
-	}).parse();
+.options({
+	'template':{
+		abbr: 't',
+		help: 'Path to the template'
+	},
+	'dest': {
+		help: 'The destination directory',
+		abbr: 'd'
+	},
+	'amd': {
+		help: 'Creates the domplate using the AMD pattern',
+		flag: true
+	},
+	'node': {
+		help: 'Creates the domplate using the CommonJS module pattern, compatible with browserify.',
+		flag: true
+	}
+}).parse();
 
-var isFileIO = (typeof opts.template === 'string' && typeof opts.dest === 'string');
+var FileIO = require('./src/fileIO'),
+io = new FileIO(opts);
+var finish = function(){
+	console.log('All done!');
+	process.exit(0);
+};
 
-if(!isFileIO){
-	console.log('Must set -t and -d');
-	process.exit(1);
-}
-
-if(opts.amd && opts.node){
-	console.log("Must set either --amd or --node");
-	process.exit(1);
-}
-
-if(isFileIO){
-	var FileIO = require('./src/fileIO'),
-		io = new FileIO(opts);
+if(opts.template && opts.dest){
+	io.createSingle(opts.template, opts.dest, finish);
+} else if(opts.template){
+	io.createSingle(opts.template, process.stdout, function(){
+		process.exit(0);
+	});
 }
