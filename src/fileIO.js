@@ -23,8 +23,6 @@ function FileIO(options){
 			dest += '/';
 		}
 	}
-
-	this.output = dest + this.opts.name + '.js';
 }
 FileIO.prototype.constructor = FileIO;
 module.exports = FileIO;
@@ -34,35 +32,57 @@ module.exports = FileIO;
  * @param {Function} onend Callback
  */
 FileIO.prototype.createSingle = function(template, outputDir, onend){
-	var that = this
-	opts = {
-		moduleType: this.opts.moduleType,
-		name: template.split('/').pop().replace(/\.[^.]+$/, '')
-	},
-	output = (function(){
-		if( typeof outputDir === 'object' ){ 
-			return function(domplate, onend){ outputDir = domplate; onend() };
-		} else {
-			return function(domplate, onend){
-				output = outputDir + opts.name + '.js';
-				fs.writeFile(output, domplate, function(){
-					console.log('Domplate created at: ', output);
-					onend();
-				});
-			}
-		}
-	})();
+	var that = this, tmp = template;
 
 	fs.readFile(template, function(err, data){
+		var opts = {
+			moduleType: that.opts.moduleType,
+			name: tmp.split('/').pop().replace(/\.[^.]+$/, '')
+		},
+		output = (function(){
+			if( typeof outputDir === 'object' ){ 
+				return function(domplate, onend){ outputDir = domplate; onend() };
+			} else {
+				return function(domplate, onend){
+					output = outputDir + opts.name + '.js';
+					fs.writeFile(output, domplate, function(){
+						console.log('Domplate created at: ', output);
+						onend();
+					});
+				};
+			}
+		})();
 		if(err) throw err;
 
 		var template = new Cleanshave(data.toString(), opts),
 		domplate = template.compile();
-		console.log(domplate);return;
 		output(domplate, onend);
 	});
 };
 
-FileIO.prototype.createBatch = function(onend){
+/**
+ * Create many domplates from all templates in templateDir
+ * @param {string} templateDir
+ * @param {string} outputDir
+ * @param {Function} finish
+ */
+FileIO.prototype.createBatch = function(templateDir, outputDir, onend){
+	//get templates filenames
+	var filenames = fs.readdirSync(templateDir),
+	total = filenames.length,
+	counter = 0;
 
+	filenames.forEach(function(filename){
+		var template = templateDir+filename;
+		//don't process dirs
+		if(fs.statSync(template).isDirectory()) return;
+
+		this.createSingle(template, outputDir, function(){
+			counter++;
+			//when all templates are processed, finish!
+			if(counter === total){
+				onend();
+			}
+		});
+	}, this);
 };

@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-var opts = require('nomnom')
+var fs = require('fs'),
+	opts = require('nomnom')
 .options({
 	'template':{
 		abbr: 't',
-		help: 'Path to the template'
+		help: 'Path to the template file or dir'
 	},
 	'dest': {
 		help: 'The destination directory',
@@ -26,9 +27,22 @@ var finish = function(){
 	process.exit(0);
 };
 
-if(opts.template && opts.dest){
+var templateStat = fs.statSync(opts.template),
+	singleTemplate = opts.template && templateStat.isFile(),
+	templateDir = opts.template && templateStat.isDirectory();
+if(opts.dest.substr(-1, 1) !== '/') opts.dest += '/';
+
+//template and destination defined
+if(singleTemplate && opts.dest){
 	io.createSingle(opts.template, opts.dest, finish);
-} else if(opts.template){
+
+//template dir and dest dir
+} else if(templateDir && opts.dest) {
+	if(opts.template.substr(-1, 1) !== '/') opts.template += '/';
+	io.createBatch(opts.template, opts.dest, finish);
+
+//template only defined, use stdout
+} else if(singleTemplate){
 	io.createSingle(opts.template, process.stdout, function(){
 		process.exit(0);
 	});
