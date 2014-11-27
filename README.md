@@ -1,4 +1,4 @@
-# cleanshave v0.2.0
+# cleanshave v0.3.0
 Cleanshave is a CLI tool that optimises Mustache HTML templates by compiling them into DOM based templates or domplates. In this way we can get instant performance gains for our Mustache templates without having to change them or use another templating language.
 
 ## Install
