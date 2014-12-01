@@ -40,7 +40,7 @@ Section.prototype.render = function(parentEl) {
 	//add section to sections object
 	sectionFunction += 'return parent;};';
 	createStr += sectionFunction;
-	editStr += 'shave.section(' + parentEl + ', ' + sectionId + ', data, ' + JSON.stringify(this.key) + ');';
+	editStr += 'shave.section(' + parentEl + ', ' + sectionId + ', data, ' + JSON.stringify(this.key) + ', '+ this.inverted +');';
 
 	return {
 		create: createStr,

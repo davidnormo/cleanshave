@@ -21,6 +21,9 @@ tag
     / '{{#' key:tagKey '}}' inner:template? '{{/' tagKey '}}' { 
       return new Section(key, inner, false); 
     }
+    / '{{^' key:tagKey '}}' inner:template? '{{/' tagKey '}}'{
+      return new Section(key, inner, true)
+    }
 
 tagKey
   = key:[a-zA-Z0-9 .]+ { 

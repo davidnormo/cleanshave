@@ -114,28 +114,41 @@
 	 * @param  {HTMLElement} parent The parent element of the section
 	 * @param  {Function} func The function handles generating the section block
 	 * @param  {Mixed} data  The data for the section
+	 * @param  {Bool} Inverted Are we dealing with an inverted section?
 	 * @param  {Array} key   Keys to traverse the data object
 	 */
-	shave.section = function(parent, func, data, key) {
+	shave.section = function(parent, func, data, key, inverted) {
+		inverted = inverted || false;
 		this.setContextStack(data, key);
+		var isValid = function(value){
+			if(value instanceof Array) value = value.length !== 0;
+			//not inverted: true, non-empty object, non-empty array
+			//invert: false, empty object, empty array
+			return inverted ? !value : !!value;
+		};
 
+        //resolve the value of the section key
 		var sectionValue;
 		try {
 			sectionValue = eval('data.' + key.join('.'));
 		} catch (e) {
-			return false;
+			if(!inverted){
+				return false;
+			} else{
+				sectionValue = false;
+			}
 		};
 
+		//bind section function to the context of this library
 		func = func.bind(this);
-
-		if (sectionValue instanceof Array) {
+		if (sectionValue instanceof Array && !inverted) {
 			//iterate over array
 			sectionValue.forEach(function(arrElement) {
 				parent.appendChild(func(arrElement));
 				this.contextStack.pop();
 			}, this);
 
-		} else if (sectionValue instanceof Object || !!sectionValue) {
+		} else if (isValid(sectionValue)) {
 			//use objects context or resolve bool
 			parent.appendChild(func(data));
 		}
@@ -179,7 +192,6 @@
 	shave.c = function(node) {
 		return node.cloneNode(true);
 	};
-
 
 	return shave;
 }));

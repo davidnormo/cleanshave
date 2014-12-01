@@ -28,11 +28,12 @@ Domplate.prototype.filter = function(template) {
 		//remove comments
 		.replace(/\{\{!.+?\}\}/g, '')
 		//remove blank lines and indents
-		.replace(/\n[ ]+(?=\n|(\{\{[\/#][^{]+\}\}\n))/g, '\n')
+		.replace(/\n[ ]+(?=\n|(\{\{[\/#^][^{]+\}\}\n))/g, '\n')
 		//remove whitespace and line breaks around sections
 		.replace(/[ ]+(\{\{#[^{]+\}\})\n/g, '$1')
-		//remove 
-		.replace(/[ ]+(\{\{\/[^{]+\}\})(<\/[a-zA-Z]+>)?$/, '$1')
+		//umm remove something else
+		.replace(/[ ][ ](\{\{(\/|\^)[^{]+\}\})(<\/[a-zA-Z]+>)?/, '$1')
+		//remove all new lines
 		.replace(/[\n\r]/g, '');
 }
 
