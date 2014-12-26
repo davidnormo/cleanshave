@@ -10,11 +10,7 @@ var parser = require('./parser'),
 function Domplate(template, options) {
 	this.options = options || {};
 	this.cleanTemplate = this.filter(template);
-	try {
-		this.parseTree = parser.parse(this.cleanTemplate);
-	} catch (e) {
-		console.log('error', e);
-	}
+	this.parseTree = parser.parse(this.cleanTemplate);
 }
 
 /**
@@ -50,6 +46,7 @@ Domplate.prototype.compile = function(parseTree) {
 	//loop through all top layer nodes
 	//addNode() can be called recursively to handle nested elements
 	this.parseTree.forEach(function(node) {
+		node.options = this.options;
 		var strings = node.render('frag');
 		createStr += strings.create;
 		editStr += strings.edit;
@@ -65,12 +62,6 @@ Domplate.prototype.compile = function(parseTree) {
  * @param {String} fragmentStr
  */
 Domplate.prototype.addFunction = function(createStr, editStr) {
-	//func.js static helpers
-	//var helpers = [fs.readFileSync('src/lib.min.js')];
-
-	//give access to create time context
-	//helpers.push('var that=this;');
-
 	var func = createStr +
 		'return function(data){var frag = shave.c(fragment);' + editStr + 'return frag; };';
 

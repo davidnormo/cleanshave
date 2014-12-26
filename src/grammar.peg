@@ -3,6 +3,7 @@
       Section = require('./parser/section'),
       Text = require('./parser/text'),
       HTML = require('./parser/html');
+      Partial = require('./parser/partial');
 }
 
 template
@@ -23,6 +24,9 @@ tag
     }
     / '{{^' key:tagKey '}}' inner:template? '{{/' tagKey '}}'{
       return new Section(key, inner, true)
+    }
+    /  '{{>' key:tagKey '}}' {
+      return new Partial(key);
     }
 
 tagKey

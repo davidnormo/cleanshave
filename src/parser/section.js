@@ -32,6 +32,7 @@ Section.prototype.render = function(parentEl) {
 
 	/* handle the section block */
 	this.block.forEach(function(innerNode, key) {
+		innerNode.options = this.options;
 		var results = innerNode.render('parent', true);
 		sectionFunction += results.edit;
 		createStr += results.create;

@@ -30,7 +30,7 @@ var finish = function(){
 var templateStat = fs.statSync(opts.template),
 	singleTemplate = opts.template && templateStat.isFile(),
 	templateDir = opts.template && templateStat.isDirectory();
-if(opts.dest.substr(-1, 1) !== '/') opts.dest += '/';
+if(opts.dest && opts.dest.substr(-1, 1) !== '/') opts.dest += '/';
 
 //template and destination defined
 if(singleTemplate && opts.dest){
@@ -44,6 +44,7 @@ if(singleTemplate && opts.dest){
 //template only defined, use stdout
 } else if(singleTemplate){
 	io.createSingle(opts.template, process.stdout, function(){
+		//exit without any message
 		process.exit(0);
 	});
 }

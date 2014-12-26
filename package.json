@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "author": "David Normington <david.normo@gmail.com>",
   "description": "From a hairy HTML template, to a well groomed DOM based template.",
-  "repository":{
+  "repository": {
     "type": "git",
     "url": "git@github.com:davidnormo/cleanshave.git"
   },
@@ -19,7 +19,8 @@
     "jsonfile": "^2.0.0"
   },
   "dependencies": {
-	  "nomnom": "1.8.0"
+    "mocha": "^2.1.0",
+    "nomnom": "1.8.0"
   },
   "preferGlobal": true,
   "bin": {

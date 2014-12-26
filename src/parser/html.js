@@ -35,6 +35,7 @@ HTML.prototype.render = function(parent) {
 
 	if (this.inner !== null) {
 		this.inner.forEach(function(node) {
+			node.options = this.options;
 			var results = node.render(elementVar);
 			createStr += results.create;
 			editStr += results.edit;
