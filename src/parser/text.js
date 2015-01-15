@@ -16,8 +16,8 @@ Text.prototype.render = function(parent) {
 		editStr = '',
 		vars = [];
 
-	createStr += 'var '+textId+' = document.createTextNode("'+this.text+'");';
-	editStr += parent+'.appendChild(shave.c('+textId+'));';
+	createStr += 'var '+textId+' = shave.e("'+this.text+'",true);';
+	editStr += 'shave.a('+parent+',shave.c('+textId+'));';
 	vars = [textId];
 
 	return {

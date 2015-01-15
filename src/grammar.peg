@@ -56,7 +56,7 @@ alphaword
   = word:[a-zA-Z0-9]+ { return word.join(''); }
 
 alphawords
-  = words:[a-zA-Z0-9 ]+ { return words.join(''); }
+  = words:[a-zA-Z0-9\s]+ { return words.join(''); }
 
 words
   = words:([^<{] / nonTag / ' ')+ { return words.join('').replace(/"/g, "\\\"") }

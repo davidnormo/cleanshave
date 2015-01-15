@@ -2,11 +2,11 @@ function Partial(key){
 	this.key = key;
 }
 
-Partial.prototype.render = function(){
+Partial.prototype.render = function(parentEl){
 	var output = '';
 	switch(this.options.moduleType){
 		case 'amd':
-			output = 'require("'+this.key+'")();';
+			output = parentEl+'.appendChild(shave.r("'+this.key+'", data));';
 		case 'node':
 		default:
 	}

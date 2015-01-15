@@ -7,7 +7,7 @@ var parser = require('./parser'),
  * @param {[type]} template [description]
  * @param {[type]} options  [description]
  */
-function Domplate(template, options) {
+function Compiler(template, options) {
 	this.options = options || {};
 	this.cleanTemplate = this.filter(template);
 	this.parseTree = parser.parse(this.cleanTemplate);
@@ -18,27 +18,21 @@ function Domplate(template, options) {
  * @param  {String} template
  * @return {String} The clean template
  */
-Domplate.prototype.filter = function(template) {
+Compiler.prototype.filter = function(template) {
 
 	return template
 		//remove comments
 		.replace(/\{\{!.+?\}\}/g, '')
-		//remove blank lines and indents
-		.replace(/\n[ ]+(?=\n|(\{\{[\/#^][^{]+\}\}\n))/g, '\n')
-		//remove whitespace and line breaks around sections
-		.replace(/[ ]+(\{\{#[^{]+\}\})\n/g, '$1')
-		//umm remove something else
-		.replace(/[ ][ ](\{\{(\/|\^)[^{]+\}\})(<\/[a-zA-Z]+>)?/, '$1')
-		//remove all new lines
-		.replace(/[\n\r]/g, '');
-}
+		//replace all new lines
+		.replace(/\s/g, ' ');
+};
 
 /**
  * Build the function string
  *
  * @param  {Object} parseTree
  */
-Domplate.prototype.compile = function(parseTree) {
+Compiler.prototype.compile = function(parseTree) {
 	var createStr = 'var fragment = document.createDocumentFragment();',
 		editStr = '';
 	this.elCount = {};
@@ -61,7 +55,7 @@ Domplate.prototype.compile = function(parseTree) {
  *
  * @param {String} fragmentStr
  */
-Domplate.prototype.addFunction = function(createStr, editStr) {
+Compiler.prototype.addFunction = function(createStr, editStr) {
 	var func = createStr +
 		'return function(data){var frag = shave.c(fragment);' + editStr + 'return frag; };';
 
@@ -76,4 +70,4 @@ Domplate.prototype.addFunction = function(createStr, editStr) {
 	return func;
 };
 
-module.exports = Domplate;
+module.exports = Compiler;

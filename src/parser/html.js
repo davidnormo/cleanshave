@@ -18,7 +18,7 @@ HTML.prototype.render = function(parent) {
 		editStr = '',
 		elementVar = htmlId + 'Clone';
 
-	createStr += 'var ' + htmlId + ' = document.createElement("' + this.tagname + '");';
+	createStr += 'var ' + htmlId + ' = shave.e("' + this.tagname + '");';
 	editStr += 'var ' +elementVar+' = shave.c(' + htmlId + ');';
 
 	if (this.attributes !== null) {
@@ -42,7 +42,7 @@ HTML.prototype.render = function(parent) {
 		}, this);
 	}
 
-	editStr += parent+'.appendChild('+elementVar+');';
+	editStr += 'shave.a('+parent+','+elementVar+');';
 
 	return {
 		create: createStr,

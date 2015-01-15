@@ -28,7 +28,7 @@ Section.prototype.render = function(parentEl) {
 	}
 
 	var sectionFunction = 'var ' + sectionId + ' = function(data){'+
-		'var parent = document.createDocumentFragment();';
+		'var parent = shave.d();';
 
 	/* handle the section block */
 	this.block.forEach(function(innerNode, key) {

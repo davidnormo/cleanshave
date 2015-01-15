@@ -55,8 +55,8 @@
 			"two": "second",
 			"bool": false
 		},
-		"expected": "* first\n* second\n* third\n",
-		"template": "{{^bool}}\n* first\n{{/bool}}\n* {{two}}\n{{^bool}}\n* third\n{{/bool}}\n",
+		"expected": "* first * second * third",
+		"template": "{{^bool}}* first {{/bool}}* {{two}} {{^bool}}* third{{/bool}}",
 		"desc": "Multiple inverted sections per template should be permitted."
 	}, {
 		"name": "Nested (Falsey)",
@@ -112,77 +112,5 @@
 		"expected": "\"Not Here\" == \"Not Here\"",
 		"template": "\"{{^a.b.c}}Not Here{{/a.b.c}}\" == \"Not Here\"",
 		"desc": "Dotted names that cannot be resolved should be considered falsey."
-	}, {
-		"name": "Surrounding Whitespace",
-		"data": {
-			"boolean": false
-		},
-		"expected": " | \t|\t | \n",
-		"template": " | {{^boolean}}\t|\t{{/boolean}} | \n",
-		"desc": "Inverted sections should not alter surrounding whitespace."
-	}, {
-		"name": "Internal Whitespace",
-		"data": {
-			"boolean": false
-		},
-		"expected": " |  \n  | \n",
-		"template": " | {{^boolean}} {{! Important Whitespace }}\n {{/boolean}} | \n",
-		"desc": "Inverted should not alter internal whitespace."
-	}, {
-		"name": "Indented Inline Sections",
-		"data": {
-			"boolean": false
-		},
-		"expected": " NO\n WAY\n",
-		"template": " {{^boolean}}NO{{/boolean}}\n {{^boolean}}WAY{{/boolean}}\n",
-		"desc": "Single-line sections should not alter surrounding whitespace."
-	}, {
-		"name": "Standalone Lines",
-		"data": {
-			"boolean": false
-		},
-		"expected": "| This Is\n|\n| A Line\n",
-		"template": "| This Is\n{{^boolean}}\n|\n{{/boolean}}\n| A Line\n",
-		"desc": "Standalone lines should be removed from the template."
-	}, {
-		"name": "Standalone Indented Lines",
-		"data": {
-			"boolean": false
-		},
-		"expected": "| This Is\n|\n| A Line\n",
-		"template": "| This Is\n  {{^boolean}}\n|\n  {{/boolean}}\n| A Line\n",
-		"desc": "Standalone indented lines should be removed from the template."
-	}, {
-		"name": "Standalone Line Endings",
-		"data": {
-			"boolean": false
-		},
-		"expected": "|\r\n|",
-		"template": "|\r\n{{^boolean}}\r\n{{/boolean}}\r\n|",
-		"desc": "\"\\r\\n\" should be considered a newline for standalone tags."
-	}, {
-		"name": "Standalone Without Previous Line",
-		"data": {
-			"boolean": false
-		},
-		"expected": "^\n/",
-		"template": "  {{^boolean}}\n^{{/boolean}}\n/",
-		"desc": "Standalone tags should not require a newline to precede them."
-	}, {
-		"name": "Standalone Without Newline",
-		"data": {
-			"boolean": false
-		},
-		"expected": "^\n/\n",
-		"template": "^{{^boolean}}\n/\n  {{/boolean}}",
-		"desc": "Standalone tags should not require a newline to follow them."
-	}, {
-		"name": "Padding",
-		"data": {
-			"boolean": false
-		},
-		"expected": "|=|",
-		"template": "|{{^ boolean }}={{/ boolean }}|",
-		"desc": "Superfluous in-tag whitespace should be ignored."
 	}]
 }

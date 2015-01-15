@@ -78,12 +78,10 @@ var specs = [{
 }];
 
 describe('Domplate', function() {
-	// specs = [specs[3]];
 	specs.forEach(function(spec){
 		it(spec.desc, function(){
 			var template = new Cleanshave(spec.template, { name: 'domplate' });
 			var result = template.compile();
-			// console.log(result);
 
 			jsdom.env('<p>hi</p>', function(errs, window) {
 				window.shave = shave;

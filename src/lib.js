@@ -1,18 +1,20 @@
 (function(root, factory) {
 	if (typeof define === 'function' && define.amd) {
 		// AMD. Register as an anonymous module.
-		define([], factory);
+		define(['require'], factory);
 	} else if (typeof exports === 'object') {
 		// Node. Does not work with strict CommonJS, but
 		// only CommonJS-like environments that support module.exports,
 		// like Node.
-		module.exports = factory();
+		module.exports = factory(require);
 	} else {
 		// Browser globals (root is window)
 		root.shave = factory();
 	}
-}(this, function() {
+}(this, function(require) {
 	var shave = {};
+
+	shave.require = require;
 
 	/**
 	 * Escapes & " ' < and >
@@ -191,6 +193,34 @@
 	 */
 	shave.c = function(node) {
 		return node.cloneNode(true);
+	};
+
+	shave.d = function(){
+		return document.createDocumentFragment();
+	};
+
+	/**
+	 * Create a node
+	 * @param  {string} el   Tag name or text content if text node
+	 * @param  {bool} text   Create a text node?
+	 * @return {Node}
+	 */
+	shave.e = function(el, text){
+		return text ? document.createTextNode(el) : document.createElement(el);
+	};
+
+	/**
+	 * Require partial, handles require miss errors
+	 * @param  {string} key 
+	 * @param  {Object} data
+	 * @return {Node}
+	 */
+	shave.r = function(key, data){
+		try {
+			return this.require(key)(data);
+		} catch(e){
+			return document.createTextNode('');
+		}
 	};
 
 	return shave;
