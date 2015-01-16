@@ -23,7 +23,7 @@ Tag.prototype.render = function(parent, isSection) {
 	if (parent) {
 		if (this.escape) {
 			//escape
-			editStr += parent + '.appendChild(document.createTextNode(shave.resolve(' + JSON.stringify(tag) + dataStr + ')));';
+			editStr += 'shave.a('+parent + ',shave.e(shave.resolve(' + JSON.stringify(tag) + dataStr + '),true));';
 		} else {
 			if (isSection) {
 				//no escape

@@ -8,7 +8,7 @@ function HTML(tagname, attributes, inner) {
 var uniqueId = (function() {
 	var id = 0;
 	return function() {
-		return 'html' + (++id);
+		return 'h' + (++id);
 	};
 })();
 

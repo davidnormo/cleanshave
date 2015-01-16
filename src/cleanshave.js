@@ -33,7 +33,7 @@ Compiler.prototype.filter = function(template) {
  * @param  {Object} parseTree
  */
 Compiler.prototype.compile = function(parseTree) {
-	var createStr = 'var fragment = document.createDocumentFragment();',
+	var createStr = 'var fragment = shave.d();',
 		editStr = '';
 	this.elCount = {};
 
@@ -60,9 +60,9 @@ Compiler.prototype.addFunction = function(createStr, editStr) {
 		'return function(data){var frag = shave.c(fragment);' + editStr + 'return frag; };';
 
 	if (this.options.moduleType === 'amd') {
-		func = 'define(["shave"],function(){' + func + '});';
+		func = 'define(["shave"],function(shave){' + func + '});';
 	} else if(this.options.moduleType === 'node'){ 
-		func = 'var shave = require("shave");module.exports = (function(){' + func +'})();';	
+		func = 'var shave = require("./shave");module.exports = (function(){' + func +'})();';	
 	} else {
 		func = 'window.' + this.options.name + '=(function(){' + func + '})();';
 	}
