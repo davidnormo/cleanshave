@@ -35,9 +35,9 @@ describe('Partials', function() {
 				};
 				var define = function(){ 
 					if(!window.domplate){
-						window.domplate = arguments[1]();
+						window.domplate = arguments[1](shave);
 					} else {
-						window.partial = arguments[1]();
+						window.partial = arguments[1](shave);
 					}
 				};
 				shave.require = require;

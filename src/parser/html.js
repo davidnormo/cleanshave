@@ -8,7 +8,7 @@ function HTML(tagname, attributes, inner) {
 var uniqueId = (function() {
 	var id = 0;
 	return function() {
-		return 'html' + (++id);
+		return 'h' + (++id);
 	};
 })();
 
@@ -16,7 +16,7 @@ HTML.prototype.render = function(parent) {
 	var htmlId = uniqueId(),
 		createStr = '',
 		editStr = '',
-		elementVar = htmlId + 'Clone';
+		elementVar = htmlId + 'C';
 
 	createStr += 'var ' + htmlId + ' = shave.e("' + this.tagname + '");';
 	editStr += 'var ' +elementVar+' = shave.c(' + htmlId + ');';

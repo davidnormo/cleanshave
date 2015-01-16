@@ -1,5 +1,6 @@
 var fs = require('fs'),
-Cleanshave = require('./cleanshave');
+	fsExtra = require('fs.extra'),
+	Cleanshave = require('./cleanshave');
 
 /**
  * FileIO reads in a file, transpiles and outputs to the target dir
@@ -22,6 +23,14 @@ function FileIO(options){
 		if(dest.lastIndexOf('/') !== (dest.length - 1)){
 			dest += '/';
 		}
+
+		fsExtra.copy('src/lib.min.js', dest+'shave.js', { replace: true }, function(err){
+			if(err){
+				throw err;
+			}
+
+			console.log('Library written to: '+dest+'shave.js');
+		});
 	}
 }
 FileIO.prototype.constructor = FileIO;
@@ -69,8 +78,8 @@ FileIO.prototype.createSingle = function(template, outputDir, onend){
 FileIO.prototype.createBatch = function(templateDir, outputDir, onend){
 	//get templates filenames
 	var filenames = fs.readdirSync(templateDir),
-	total = filenames.length,
-	counter = 0;
+		total = filenames.length,
+		counter = 0;
 
 	filenames.forEach(function(filename){
 		var template = templateDir+filename;
