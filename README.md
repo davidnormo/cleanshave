@@ -24,18 +24,18 @@ $ npm install -g cleanshave
 
 ## Supported Features
 
-[x] AMD  
-[x] CommonJS  
-[x] Global  
+- AMD  
+- CommonJS  
+- Global  
 
 ### Mustache
 
-[x] Comments  
-[x] Interpolation  
-[x] Sections  
-[x] Inverted Sections  
-[x] Partials  
-[ ] Functions  
+- Comments  
+- Interpolation  
+- Sections  
+- Inverted Sections  
+- Partials
+- ~~Lambdas~~
 
 ## Change Log
 
