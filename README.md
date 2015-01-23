@@ -1,4 +1,4 @@
-# Cleanshave v0.4.0
+# Cleanshave v0.4.1
 Note: There are currently quite a few changes happening, the API isn't stable yet.  
 
 Cleanshave is a CLI tool that optimises Mustache HTML templates by compiling them into DOM based templates or domplates. In this way we can get instant performance gains for our Mustache templates without having to change them or use another templating language.
@@ -36,3 +36,10 @@ $ npm install -g cleanshave
 [x] Inverted Sections  
 [x] Partials  
 [ ] Functions  
+
+## Change Log
+
+### v0.4.1
+
+- Added a change log
+- Support for all core mustache syntax
