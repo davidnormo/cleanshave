@@ -24,7 +24,7 @@ function FileIO(options){
 			dest += '/';
 		}
 
-		fsExtra.copy('src/lib.min.js', dest+'shave.js', { replace: true }, function(err){
+		fsExtra.copy(__dirname + '/lib.min.js', dest+'shave.js', { replace: true }, function(err){
 			if(err){
 				throw err;
 			}

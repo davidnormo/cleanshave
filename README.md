@@ -39,6 +39,10 @@ $ npm install -g cleanshave
 
 ## Change Log
 
+### v0.4.2
+
+- Fixed breakages
+
 ### v0.4.1
 
 - Added a change log
